@@ -1,0 +1,167 @@
+#!/bin/bash
+#
+#piccolo script per il controllo della formattazione dei file pianeta per il wator
+#author: Marco Barbone
+#copyright: 2015 Marco Barbone
+#
+if [ $# -gt 2 ]
+	then 
+		echo "troppi argomenti prova watorscript --help per informazioni" 1>&2
+		exit 1
+fi
+
+if [ $# -eq 0 ]
+		then 
+		echo "nessun argomento prova watorscript --help per informazioni" 1>&2
+		exit 1
+fi
+		
+let ARGS=0
+		
+		for VAR do
+			if [ -f $VAR ]
+				then
+				ARGS=1
+				break
+			fi
+		done
+		
+		if [ $ARGS -eq 0 ]
+			then
+				if [ $1 = --help ] && [ $# -eq 1 ]
+					then
+					echo "script per il controllo della formattazione dei planetfile del wator" 1>&2
+					echo "usage: watorscript [OPTION] " 1>&2
+					echo "	lo script senza opzioni controlla la formattazione del file di input,"  1>&2
+					echo "		se è corretta stampa OK alrimenti NO." 1>&2
+					echo "	Con l'opzione [-s] lo script se il file è ben formattato" 1>&2
+					echo "		stampa il numero di squali, " 1>&2
+                                 	echo "		altrimenti stampa NO. " 1>&2
+					echo "	Con l'opzione [-f] lo script se il file è ben formattato" 1>&2
+					echo "		stampa il numero di pesci," 1>&2
+					echo "		altrimenti stampa NO. " 1>&2
+					exit 1
+				fi
+
+				if [ $1 = --help ] && [ $# -eq 2 ]
+					then
+					echo "possibili parametri -s -f --help per informazioni" 1>&2
+					exit 1
+				fi
+			
+			echo "file non trovato" 1>&2
+			exit 1
+		fi
+		
+IFS=''
+		
+exec 3< $VAR
+
+read -u 3 RIGHE
+
+case $RIGHE in
+	''|*[!0-9]*) 
+		echo "NO" 1>&2
+		exit 1
+		;;
+ 	 *) 
+   		;;
+esac
+		
+read -u 3 COLONNE
+		
+case $COLONNE in
+    	''|*[!0-9]*) 
+		echo "NO" 1>&2
+		exit 1
+		;;
+   	*) 
+   		;;
+esac
+		
+PESCI=0	
+SQUALI=0
+		
+for ((j=1; j<=$RIGHE; j++)); do
+	for ((i=1; i<=$COLONNE; i++)); do
+		read -u 3 -n 2 TMP
+		if [ $i -eq $COLONNE ]
+			then
+				case $TMP in 
+					F) 	((PESCI++))
+						continue ;;
+
+					S) 	((SQUALI++))
+						continue ;;
+
+					W) 	continue ;;
+
+					*) 	echo "NO" 1>&2
+						exit 1
+						;;
+				esac
+			else
+				case $TMP in 
+				W\ ) 	continue ;;
+				S\ ) 	((SQUALI++))
+					continue ;;
+				F\ )	 ((PESCI++))
+					continue ;;
+				*) 	echo "NO" 1>&2
+					exit 1
+					;;
+				esac
+		fi
+	done		
+done
+
+read -u 3 -n 1 TMP
+
+if  ! [ "$TMP" = '' ]
+	then
+		echo NO 1>&2	
+		exit 1
+	fi
+
+if [ $# -eq 1 ] && [ $1 = --help ]
+	then
+		echo "script per il controllo della formattazione dei planetfile del wator" 1>&2
+		echo "usage: watorscript [OPTION] " 1>&2	
+		echo "	lo script senza opzioni controlla la formattazione del file di input,"  1>&2
+		echo "		se è corretta stampa OK alrimenti NO." 1>&2
+		echo "	Con l'opzione [-s] lo script se il file è ben formattato" 1>&2
+		echo "		stampa il numero di squali, " 1>&2
+              	echo "		altrimenti stampa NO. " 1>&2
+		echo "	Con l'opzione [-f] lo script se il file è ben formattato" 1>&2
+		echo "		stampa il numero di pesci," 1>&2
+		echo "		altrimenti stampa NO. " 1>&2
+		exit 1
+		echo OK 1>&2
+fi
+
+if [ $# -eq 2 ]
+	then
+	for VAR 
+		do
+		case $VAR in
+			-s) echo $SQUALI 
+				ARGS=1
+				break
+				;;
+			-f) echo $PESCI 
+				ARGS=1
+				break
+				;;
+		esac
+	done
+
+if [ $ARGS -eq 0 ]
+	then 
+	echo "possibili parametri -s -f prova watorscript  --help per informazioni" 1>&2
+	exit 1
+	fi
+
+fi
+
+exit 0
+
